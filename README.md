@@ -113,3 +113,122 @@ kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.pas
 - Jenkins автоматично будує та публікує Docker-образ;
 - Argo CD синхронізує застосунок у Kubernetes згідно з GitOps-підходом.
 
+---
+
+### Назва модуля та короткий опис
+
+```markdown
+# Terraform RDS Module
+
+Універсальний модуль для створення бази даних AWS:
+- Підтримка Aurora та звичайної RDS (`use_aurora`).
+- Створює DB Subnet Group, Security Group, Parameter Group.
+- Підтримує налаштування engine, версії, класу інстансу, multi-AZ.
+```
+
+---
+
+### Приклад використання
+
+```hcl
+module "rds" {
+  source      = "./modules/rds"
+  
+  use_aurora       = false       # true для Aurora, false для RDS
+  engine           = "postgres"
+  engine_version   = "17.2"
+  instance_class   = "db.t3.medium"
+  multi_az         = true
+  db_name          = "myapp"
+  password         = "secure_password"
+  subnet_ids       = ["subnet-aaa", "subnet-bbb", "subnet-ccc"]
+  vpc_id           = "vpc-xxxx"
+  tags             = {
+    Environment = "dev"
+    Project     = "myapp"
+  }
+}
+```
+
+---
+
+### Опис змінних
+
+- **`use_aurora`**
+  - Тип: `bool`
+  - Значення за замовчуванням: `false`
+  - Опис:
+    - Визначає, чи буде використовуватися Amazon Aurora.
+    - Якщо `false` — створюється звичайна RDS-інстанція.
+
+- **`engine`**
+  - Тип: `string`
+  - Значення за замовчуванням: `"postgres"`
+  - Опис:
+    - Тип рушія бази даних.
+    - Підтримувані значення: `postgres`, `mysql` тощо.
+
+- **`engine_version`**
+  - Тип: `string`
+  - Значення за замовчуванням: `"17.2"`
+  - Опис:
+    - Версія обраного рушія бази даних.
+    - Повинна відповідати підтримуваним версіям у провайдері.
+
+- **`instance_class`**
+  - Тип: `string`
+  - Значення за замовчуванням: `"db.t3.medium"`
+  - Опис:
+    - Клас інстансу для RDS.
+    - Визначає ресурси (CPU, RAM) бази даних.
+
+- **`multi_az`**
+  - Тип: `bool`
+  - Значення за замовчуванням: `true`
+  - Опис:
+    - Увімкнення Multi-AZ розгортання.
+    - Забезпечує підвищену відмовостійкість.
+
+- **`db_name`**
+  - Тип: `string`
+  - Значення за замовчуванням: `"myapp"`
+  - Опис:
+    - Ім’я бази даних, що буде створена.
+
+- **`password`**
+  - Тип: `string`
+  - Значення за замовчуванням: не задано
+  - Опис:
+    - Пароль користувача `postgres`.
+    - Рекомендується передавати через змінні середовища або secrets.
+
+- **`subnet_ids`**
+  - Тип: `list(string)`
+  - Значення за замовчуванням: `[]`
+  - Опис:
+    - Список ID підмереж.
+    - Використовується для створення DB Subnet Group.
+
+- **`vpc_id`**
+  - Тип: `string`
+  - Значення за замовчуванням: не задано
+  - Опис:
+    - Ідентифікатор VPC.
+    - В межах цієї VPC буде створено ресурси.
+
+- **`tags`**
+  - Тип: `map(string)`
+  - Значення за замовчуванням: `{}`
+  - Опис:
+    - Набір тегів для створюваних ресурсів.
+    - Дозволяє групувати та ідентифікувати інфраструктуру.
+
+---
+
+### Як змінити конфігурацію
+
+* **Тип БД та engine:** змінюємо `use_aurora` і `engine`.
+* **Версія engine:** `engine_version`.
+* **Клас інстансу:** `instance_class`.
+* **Multi-AZ:** `multi_az = true/false`.
+* **Subnet group та VPC:** передаємо `subnet_ids` і `vpc_id`.
