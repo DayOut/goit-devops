@@ -232,3 +232,79 @@ module "rds" {
 * **Клас інстансу:** `instance_class`.
 * **Multi-AZ:** `multi_az = true/false`.
 * **Subnet group та VPC:** передаємо `subnet_ids` і `vpc_id`.
+
+-----
+
+## 4 Налаштування Grafana та Prometheus
+```
+kubectl create namespace monitoring
+```
+
+### 4.1. Встановлення Prometheus та Grafana
+
+Додайте репозиторій Prometheus Community:
+
+```bash
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update
+```
+
+-----
+
+### 4.2. Доступ до Grafana UI
+
+Отримайте URL Grafana Service:
+
+```bash
+kubectl get svc -n monitoring
+```
+
+Знайдіть Service типу **`LoadBalancer`** (або `NodePort`) для Grafana, щоб отримати зовнішню URL-адресу.
+
+Виконайте порт-форвардинг (якщо не використовуєте Load Balancer):
+
+```bash
+kubectl port-forward svc/<GRAFANA_SVC_NAME> 8080:80 -n monitoring
+# Далі відкрийте http://localhost:8080
+```
+
+Отримайте пароль Grafana (якщо встановлено через Helm):
+
+```bash
+kubectl get secret --namespace monitoring <GRAFANA_SECRET_NAME> -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
+# Логін за замовчуванням: admin
+```
+
+-----
+
+### 4.3. Налаштування Джерела Даних (Data Source)
+
+1.  Увійдіть у Grafana (зазвичай пароль `admin`).
+
+2.  Перейдіть до **Configuration → Data Sources**.
+
+3.  Натисніть **Add data source** та виберіть **Prometheus**.
+
+4.  **Введіть Prometheus Server URL:**
+    Оскільки Prometheus і Grafana знаходяться в одному кластері (EKS), використовуйте внутрішній Service DNS:
+
+    ```
+    http://<PROMETHEUS_SVC_NAME>.monitoring.svc.cluster.local:9090
+    ```
+
+    > Якщо Prometheus встановлений як `prometheus-server`, URL буде:
+    > `http://prometheus-server.monitoring.svc.cluster.local:9090`
+
+5.  Натисніть **Save & test**. Має з'явитися повідомлення: `Data source is working`.
+
+
+-----
+
+### 4.4. Імпорт Дашборда Моніторингу
+
+1.  У Grafana натисніть **`+` (Create) → Import**.
+2.  Використовуйте стандартний ID для моніторингу наприклад Kubernetes/Kube-State-Metrics:
+      * **ID:** `13337`
+3.  Натисніть **Load**.
+4.  На екрані конфігурації виберіть ваше щойно створене джерело даних **Prometheus**.
+5.  Натисніть **Import** і перегляньте метрики кластера.
