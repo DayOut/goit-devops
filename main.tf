@@ -15,7 +15,7 @@ module "vpc" {
 
 module "ecr" {
   source      = "./modules/ecr"
-  ecr_name    = "lesson-9-ecr"
+  ecr_name    = "final-project-ecr"
   scan_on_push = true
 }
 
@@ -60,6 +60,7 @@ module "jenkins" {
   github_user        = var.github_user
   github_repo_url     = var.github_repo_url
   ecr_repository_url  = module.ecr.ecr_url
+  jenkins_admin_password = var.jenkins_admin_password
   depends_on         = [module.eks]
   providers          = {
     helm       = helm
@@ -74,7 +75,7 @@ module "argo_cd" {
   github_repo_url     = var.github_repo_url
   github_user         = var.github_user
   github_pat          = var.github_pat
-  app_target_revision = "lesson-9"
+  app_target_revision = "final-project"
   depends_on = [module.eks]
   providers = {
     helm       = helm
@@ -103,14 +104,16 @@ module "rds" {
   allocated_storage          = 20
   db_name                    = "myapp"
   username                   = "postgres"
-  password                   = "MySuperSecretPassword321"
+  password                   = var.rds_password
 
   subnet_private_ids         = module.vpc.private_subnets
   subnet_public_ids          = module.vpc.public_subnets
 
-  publicly_accessible        = true
+  publicly_accessible        = false
   multi_az                   = true
   backup_retention_period    = 7
+
+  allowed_cidr_blocks        = ["10.0.0.0/16"]
 
   parameters = {
     max_connections              = "200"

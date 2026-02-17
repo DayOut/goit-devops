@@ -1,7 +1,7 @@
 controller:
   admin:
     username: admin
-    password: admin123
+    password: ${jenkins_admin_password}
 
   serviceType: LoadBalancer
   servicePort: 80
@@ -104,7 +104,7 @@ controller:
                       url('${github_repo_url}')
                       credentials('github-token')
                     }
-                    branches('*/lesson-9')
+                    branches('*/final-project')
                   }
                 }
                 steps {
@@ -119,7 +119,7 @@ controller:
                                   url("${github_repo_url}")
                                   credentials("github-token")
                                 }
-                                branches("*/lesson-9")
+                                branches("*/final-project")
                               }
                             }
                           }

@@ -17,3 +17,15 @@ output "reader_instances" {
 output "cluster_arn" {
   value = try(aws_rds_cluster.aurora[0].arn, null)
 }
+
+output "rds_endpoint" {
+  value = try(aws_db_instance.standard[0].endpoint, null)
+}
+
+output "rds_address" {
+  value = try(aws_db_instance.standard[0].address, null)
+}
+
+output "rds_arn" {
+  value = try(aws_db_instance.standard[0].arn, null)
+}

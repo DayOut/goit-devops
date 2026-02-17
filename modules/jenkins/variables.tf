@@ -40,3 +40,9 @@ variable "ecr_repository_url" {
   description = "ECR repository URL for Docker images"
   type        = string
 }
+
+variable "jenkins_admin_password" {
+  description = "Jenkins admin password"
+  type        = string
+  sensitive   = true
+}

@@ -88,7 +88,7 @@ kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.pas
 
 1. У веб-інтерфейсі Argo CD вибрати застосунок Django-проєкту.
 2. Натиснути **Sync** з параметрами:
-   - `Revision`: `lesson-9`
+   - `Revision`: `final-project`
    - `Prune`: enabled
    - `Apply Out of Sync Only`: enabled
    - `Server-Side Apply`: enabled

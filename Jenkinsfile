@@ -88,8 +88,8 @@ spec:
               
               cd repo-temp
               
-              # Checkout main branch
-              git checkout main 2>/dev/null || git checkout master 2>/dev/null || git checkout -b main
+              # Checkout final-project branch
+              git checkout final-project 2>/dev/null || git checkout -b final-project
               
               # Update values.yaml
               cd charts/django-app
@@ -105,7 +105,7 @@ spec:
                 echo "No changes to commit"
               else
                 git commit -m "Update image tag to $IMAGE_TAG [skip ci]"
-                git push origin main
+                git push origin final-project
               fi
             '''
           }
